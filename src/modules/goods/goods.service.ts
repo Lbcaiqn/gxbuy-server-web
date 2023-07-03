@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'express';
 import { Repository, Like } from 'typeorm';
 import { GoodsSpu } from './entities/goods_spu.entity';
+import { GoodsComment } from './entities/goods_comment.entity';
 import { User } from '../user/entities/user.entity';
 import { UserFavorite } from '../user/entities/user_favorite.entity';
 import { UserFollow } from '../user/entities/user_follow.entity';
@@ -17,6 +18,7 @@ import { SECRCT } from '@/common/secrct';
 export class GoodsService {
   constructor(
     @InjectRepository(GoodsSpu) private readonly goodsSpuRepository: Repository<GoodsSpu>,
+    @InjectRepository(GoodsComment) private readonly goodsCommentRepository: Repository<GoodsComment>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(UserFavorite) private readonly userFavoriteRepository: Repository<UserFavorite>,
     @InjectRepository(UserFollow) private readonly userFollowRepository: Repository<UserFollow>,
@@ -28,7 +30,7 @@ export class GoodsService {
   async searchGoods(req: Request) {
     const { keyword, c1id, c2id, c3id, pageSize, page } = req.query as any;
 
-    const where: any = {};
+    const where: any = { isGrounding: true };
 
     if (keyword) where.goods_spu_name = Like(`%${keyword}%`);
     if (c1id) where.c1id = c1id;
@@ -119,11 +121,12 @@ export class GoodsService {
 
     const order: any = {};
     if (feature === 'hot') order.goods_sku_total_sales = 'desc';
-    else if (feature === 'new') order.add_time = 'desc';
+    else if (feature === 'new') order.update_time = 'desc';
     else if (feature === 'pop') order.goods_spu_total_favorite = 'desc';
 
     const data = await this.goodsSpuRepository.find({
       relations: ['shop'],
+      where: { isGrounding: true },
       skip: (page - 1) * pageSize || 0,
       take: pageSize || 30,
       order,
@@ -137,7 +140,7 @@ export class GoodsService {
 
     const data = await this.goodsSpuRepository.findAndCount({
       relations: ['shop'],
-      where: { shop_id: id },
+      where: { shop_id: id, isGrounding: true },
       skip: (page - 1) * pageSize || 0,
       take: pageSize || 30,
     });
@@ -151,11 +154,11 @@ export class GoodsService {
   async getGoodsComment(id: string, req: Request) {
     const { pageSize, page } = req.query as any;
 
-    const data = await this.orderItemRepository.findAndCount({
+    const data = await this.goodsCommentRepository.findAndCount({
       relations: ['user'],
       where: { goods_spu_id: id },
       order: {
-        add_time: 'desc',
+        update_time: 'desc',
       },
       skip: (page - 1) * pageSize || 0,
       take: pageSize || 15,

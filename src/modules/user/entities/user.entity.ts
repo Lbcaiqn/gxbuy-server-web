@@ -7,6 +7,10 @@ import { UserFollow } from './user_follow.entity';
 import { OrderInformation } from '@/modules/order/entities/order_information.entity';
 import { OrderItem } from '@/modules/order/entities/order_item.entity';
 
+enum SexType {
+  MALE = '男',
+  REMALE = '女',
+}
 @Entity()
 export class User {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
@@ -20,6 +24,13 @@ export class User {
 
   @Column({ type: 'varchar', length: 50, unique: true, nullable: false })
   user_name: string;
+
+  @Column({
+    type: 'enum',
+    enum: SexType,
+    nullable: false,
+  })
+  user_sex: SexType;
 
   @Column({ type: 'varchar', length: 250, nullable: false })
   user_icon: string;
@@ -57,6 +68,13 @@ export class User {
     nullable: false,
   })
   add_time: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
+  update_time: Date;
 
   @OneToMany(() => UserFavorite, uf => uf.user)
   user_favorite: UserFavorite[];

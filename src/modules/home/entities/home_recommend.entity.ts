@@ -24,4 +24,18 @@ export class HomeRecommend {
 
   @OneToMany(() => HomeRecommend, hr => hr.parent)
   children: HomeRecommend[];
+
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  add_time: Date;
+
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  update_time: Date;
 }

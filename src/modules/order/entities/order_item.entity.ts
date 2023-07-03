@@ -31,11 +31,12 @@ export class OrderItem {
     scale: 2,
     unsigned: true,
     nullable: false,
+    default: '0.00'
   })
   goods_sku_price: string;
 
   @Column({ type: 'json', nullable: true })
-  sku_sales_attrs: JSON;
+  sku_sales_attrs: Array<{ name: string; value: string }>;
 
   @Column({
     type: 'timestamp',

@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '@/modules/user/entities/user.entity';
 import { OrderItem } from './order_item.entity';
+import { Shop } from '@/modules/shop/entities/shop.entity';
 
 enum StateType {
   WAITPAID = 'wait_paid',
@@ -23,6 +24,9 @@ export class OrderInformation {
   })
   order_state: StateType;
 
+  @Column({ type: 'varchar', length: 30, nullable: false, default: '' })
+  order_notes: string;
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -41,9 +45,17 @@ export class OrderInformation {
   @Column({ type: 'bigint', unsigned: true, nullable: true })
   user_id: string;
 
+  @Index()
+  @Column({ type: 'bigint', unsigned: true })
+  shop_id: string;
+
   @ManyToOne(() => User, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => Shop, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'shop_id' })
+  shop: Shop;
 
   @OneToMany(() => OrderItem, oitem => oitem.order_information)
   order_item: OrderItem[];

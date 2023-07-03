@@ -22,4 +22,18 @@ export class HomeBanner {
     nullable: false,
   })
   type: BannerType;
+
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  add_time: Date;
+
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  update_time: Date;
 }

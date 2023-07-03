@@ -1,10 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm';
 import { GoodsSpu } from './goods_spu.entity';
+import { Shop } from '@/modules/shop/entities/shop.entity';
 
 enum GoodsImgType {
   BANNER = 'banner',
-  DETAIL = 'detail',
-  COMMENT = 'comment',
+  DETAIL = 'detail'
 }
 
 @Entity()
@@ -12,14 +12,9 @@ export class GoodsImg {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   _id: string;
 
-  @Column({ type: 'varchar', length: 250, nullable: false })
-  goods_img_url: string;
+  @Column({ type: 'json', nullable: false })
+  goods_img_list: Array<{description:string;url:string}>;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  goods_img_description: string;
-
-  @Column({ type: 'tinyint', unsigned: true, nullable: false })
-  goods_img_order: number;
 
   @Column({
     type: 'enum',
@@ -35,11 +30,27 @@ export class GoodsImg {
   })
   add_time: Date;
 
+  
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
+  update_time: Date;
+
   @Index()
   @Column({ type: 'bigint', unsigned: true, nullable: true })
   goods_spu_id: string;
 
+  @Index()
+  @Column({ type: 'bigint', unsigned: true, nullable: true })
+  shop_id: string;
+
   @ManyToOne(() => GoodsSpu, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'goods_spu_id' })
   goods_spu: GoodsSpu;
+
+  @ManyToOne(() => Shop, { createForeignKeyConstraints: false })
+  @JoinColumn({ name: 'shop_id' })
+  shop: Shop;
 }

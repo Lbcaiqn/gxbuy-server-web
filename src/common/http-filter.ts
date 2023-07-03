@@ -4,6 +4,12 @@ import { Request, Response, NextFunction } from 'express';
 @Catch()
 export class HttpFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
+    // 如果是服务器自己语法逻辑错误，则直接return
+    if (!exception.getStatus) {
+      console.log(exception);
+      return;
+    }
+
     const ctx = host.switchToHttp();
 
     const req = ctx.getRequest<Request>(),

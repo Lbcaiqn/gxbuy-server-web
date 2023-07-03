@@ -158,6 +158,7 @@ export class OrderService {
 
     orderInformation.user = user;
     orderInformation.order_state = StateType.WAITPAID;
+    orderInformation.shop_id = shopId;
 
     orderItem.order_information = orderInformation;
     orderItem.user = user;

@@ -14,6 +14,13 @@ export class UserFavorite {
   })
   add_time: Date;
 
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  update_time: Date;
+
   @Index()
   @Column({ type: 'bigint', unsigned: true, nullable: true })
   user_id: string;

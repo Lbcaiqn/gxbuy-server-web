@@ -21,4 +21,18 @@ export class HomeFloor {
 
   @OneToMany(() => HomeFloor, hf => hf.parent)
   children: HomeFloor[];
+
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  add_time: Date;
+
+  @Column({
+    type: "timestamp",
+    default: () => "CURRENT_TIMESTAMP",
+    nullable: false,
+  })
+  update_time: Date;
 }

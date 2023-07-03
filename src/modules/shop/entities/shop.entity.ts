@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { GoodsSpu } from '@/modules/goods/entities/goods_spu.entity';
 import { GoodsSku } from '@/modules/goods/entities/goods_sku.entity';
+import { GoodsImg } from '@/modules/goods/entities/goods_img.entity';
 import { Shopcart } from '@/modules/shopcart/entities/shopcart.entity';
 import { ShopManager } from './shop_manager.entity';
 import { ShopManagerRole } from './shop_manager_role.entity';
@@ -24,6 +25,18 @@ export class Shop {
   @Column({ type: 'varchar', length: 250, nullable: false })
   shop_logo: string;
 
+  @Column({ type: 'varchar', length: 20, nullable: false })
+  shop_address: string;
+
+  @Column({ type: 'double', unsigned: true, nullable: false, default: 0.0 })
+  describe_level: number;
+
+  @Column({ type: 'double', unsigned: true, nullable: false, default: 0.0 })
+  service_level: number;
+
+  @Column({ type: 'double', unsigned: true, nullable: false, default: 0.0 })
+  logistics_level: number;
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
@@ -31,11 +44,21 @@ export class Shop {
   })
   add_time: Date;
 
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
+  update_time: Date;
+
   @OneToMany(() => GoodsSpu, gspu => gspu.shop)
   goods_spu: GoodsSpu[];
 
   @OneToMany(() => GoodsSku, gsku => gsku.shop)
   goods_sku: GoodsSku[];
+
+  @OneToMany(() => GoodsImg, gi => gi.shop)
+  goods_img: GoodsImg[];
 
   @OneToMany(() => Shopcart, sc => sc.shop)
   shopcart: Shopcart[];

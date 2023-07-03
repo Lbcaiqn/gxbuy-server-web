@@ -1,11 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './user.entity';
-import { Shop } from '@/modules/shop/entities/shop.entity';
 
 @Entity()
-export class UserFollow {
+export class UserAddress {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   _id: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: false })
+  name: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: false })
+  phone: string;
+
+  @Column({ type: 'varchar', length: 20, nullable: false })
+  area: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  detail: string;
 
   @Column({
     type: 'timestamp',
@@ -22,18 +33,10 @@ export class UserFollow {
   update_time: Date;
 
   @Index()
-  @Column({ type: 'bigint', unsigned: true, nullable: true })
+  @Column({ type: 'bigint', unsigned: true })
   user_id: string;
-
-  @Index()
-  @Column({ type: 'bigint', unsigned: true, nullable: true })
-  shop_id: string;
 
   @ManyToOne(() => User, { createForeignKeyConstraints: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
-
-  @ManyToOne(() => Shop, { createForeignKeyConstraints: false })
-  @JoinColumn({ name: 'shop_id' })
-  shop: Shop;
 }

@@ -3,6 +3,7 @@ import { Shop } from './shop.entity';
 import { ShopManagerRole } from './shop_manager_role.entity';
 
 @Entity()
+@Index('idx_unique_manager_name_by_shop', ['shop_manager_account', 'shop_id'], { unique: true })
 export class ShopManager {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   _id: string;
@@ -16,12 +17,22 @@ export class ShopManager {
   @Column({ type: 'varchar', length: 50, nullable: false })
   shop_manager_name: string;
 
+  @Column({ type: 'varchar', length: 250, nullable: false, default: '' })
+  shop_manager_icon: string;
+
   @Column({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
     nullable: false,
   })
   add_time: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
+  update_time: Date;
 
   @Index()
   @Column({ type: 'bigint', unsigned: true, nullable: true })

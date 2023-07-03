@@ -6,6 +6,7 @@ import { GoodsSpu } from './entities/goods_spu.entity';
 import { GoodsSku } from './entities/goods_sku.entity';
 import { GoodsImg } from './entities/goods_img.entity';
 import { GoodsAttribute } from './entities/goods_attribute.entity';
+import { GoodsComment } from './entities/goods_comment.entity';
 import { User } from '../user/entities/user.entity';
 import { UserFavorite } from '../user/entities/user_favorite.entity';
 import { UserFollow } from '../user/entities/user_follow.entity';
@@ -19,6 +20,7 @@ import { OrderItem } from '../order/entities/order_item.entity';
       GoodsSku,
       GoodsImg,
       GoodsAttribute,
+      GoodsComment,
       User,
       UserFavorite,
       UserFollow,

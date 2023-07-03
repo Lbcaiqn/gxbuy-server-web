@@ -21,11 +21,11 @@ import { ScheduleModule } from '@nestjs/schedule';
     TypeOrmModule.forRoot({
       type: 'mysql',
       username: 'root',
-      password: '123456',
+      password: 'Lgx123456@@',
       host: 'localhost',
       port: 3306,
       database: 'gxbuy',
-      synchronize: true,
+      // synchronize: true,
       retryDelay: 500,
       retryAttempts: 10,
       autoLoadEntities: true,

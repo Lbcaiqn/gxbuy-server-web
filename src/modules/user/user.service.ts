@@ -147,7 +147,7 @@ export class UserService {
           .innerJoinAndSelect('user_favorite.goods_spu', 'goods_spu')
           .innerJoinAndSelect('goods_spu.shop', 'shop')
           .where('user_id = :id', { id: _id })
-          .orderBy('user_favorite.add_time', 'DESC')
+          .orderBy('user_favorite.update_time', 'DESC')
           .offset((page - 1) * pageSize || 0)
           .limit(pageSize || 30)
           .getManyAndCount();
@@ -158,7 +158,7 @@ export class UserService {
           .createQueryBuilder(`user_follow`)
           .innerJoinAndSelect(`user_follow.shop`, 'shop')
           .where('user_follow.user_id = :id', { id: _id })
-          .orderBy('user_follow.add_time', 'DESC')
+          .orderBy('user_follow.update_time', 'DESC')
           .offset((page - 1) * pageSize || 0)
           .limit(pageSize || 30)
           .getManyAndCount();
@@ -183,7 +183,7 @@ export class UserService {
           .createQueryBuilder(`order_item`)
           .innerJoinAndSelect(`order_item.shop`, 'shop')
           .where('order_item.user_id = :id', { id: _id })
-          .orderBy('order_item.add_time', 'DESC')
+          .orderBy('order_item.update_time', 'DESC')
           .offset((page - 1) * pageSize || 0)
           .limit(pageSize || 30)
           .getManyAndCount();
@@ -254,7 +254,7 @@ export class UserService {
         const subData = await this.userBrowseHistoryRepository
           .createQueryBuilder('ubh')
           .where('ubh.user_id = :id', { id: _id })
-          .orderBy('add_time', 'DESC')
+          .orderBy('update_time', 'DESC')
           .offset((page - 1) * pageSize || 0)
           .limit(pageSize || 30)
           .getManyAndCount();
@@ -284,7 +284,7 @@ export class UserService {
         data = await this.userSearchHistoryRepository
           .createQueryBuilder('user_search_history')
           .where('user_id = :id', { id: _id })
-          .orderBy('user_search_history.add_time', 'DESC')
+          .orderBy('user_search_history.update_time', 'DESC')
           .offset((page - 1) * pageSize || 0)
           .limit(pageSize || 30)
           .getManyAndCount();

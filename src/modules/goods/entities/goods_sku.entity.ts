@@ -22,6 +22,7 @@ export class GoodsSku {
     scale: 2,
     unsigned: true,
     nullable: false,
+    default: '0.00',
   })
   goods_sku_price: string;
 
@@ -32,7 +33,13 @@ export class GoodsSku {
   goods_sku_stock: number;
 
   @Column({ type: 'json', nullable: true })
-  sku_sales_attrs: JSON;
+  sku_sales_attrs: Array<{ name: string; value: string }>;
+
+  @Column({ type: 'int', unsigned: true, nullable: false, default: 100 })
+  max_single_buy_quantity: number;
+
+  @Column({ type: 'boolean', nullable: false, default: false })
+  isGrounding: boolean;
 
   @Column({
     type: 'timestamp',
@@ -40,6 +47,13 @@ export class GoodsSku {
     nullable: false,
   })
   add_time: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    nullable: false,
+  })
+  update_time: Date;
 
   @Index()
   @Column({ type: 'smallint', unsigned: true, nullable: true })
