@@ -4,6 +4,7 @@ import { Request, Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { UserAddress } from './entities/user_address.entity';
 import { UserFavorite } from './entities/user_favorite.entity';
 import { UserFollow } from './entities/user_follow.entity';
 import { UserBrowseHistory } from './entities/user_browse_history.entity';
@@ -22,6 +23,7 @@ import * as bcrypt from 'bcryptjs';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserAddress) private readonly userAddressRepository: Repository<UserAddress>,
     @InjectRepository(UserFavorite) private readonly userFavoriteRepository: Repository<UserFavorite>,
     @InjectRepository(UserFollow) private readonly userFollowRepository: Repository<UserFollow>,
     @InjectRepository(UserBrowseHistory) private readonly userBrowseHistoryRepository: Repository<UserBrowseHistory>,
@@ -32,7 +34,8 @@ export class UserService {
   ) {}
 
   async register(code: string, registerInfo: UserRegisterDto) {
-    if (code !== registerInfo.code) throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
+    if (code?.toLowerCase() !== registerInfo.code?.toLowerCase())
+      throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
 
     if (await this.userRepository.findOne({ where: { user_account: registerInfo.user_account } })) {
       throw new HttpException('账号已存在', HttpStatus.BAD_REQUEST);
@@ -70,7 +73,8 @@ export class UserService {
   }
 
   async login(code: string, loginInfo: UserLoginDto) {
-    if (code !== loginInfo.code) throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
+    if (code?.toLowerCase() !== loginInfo.code?.toLowerCase())
+      throw new HttpException('验证码错误', HttpStatus.BAD_REQUEST);
 
     const user = await this.userRepository
       .createQueryBuilder('user')
@@ -103,10 +107,11 @@ export class UserService {
   async createCode(req: any, res: Response) {
     const code = svgCaptcha.create({
       size: 4,
-      fontSize: 50,
-      width: 100,
-      height: 34,
-      background: '#cc9966',
+      // fontSize: 50,
+      width: 130,
+      height: 40,
+      noise: 0,
+      color: true,
     });
 
     req.session.code = code.text;
@@ -128,6 +133,16 @@ export class UserService {
     if (!user) throw new HttpException('用户不存在', HttpStatus.BAD_REQUEST);
 
     return user;
+  }
+
+  async getUserAddress(req: Request) {
+    const { _id } = verify(req.headers.authorization, SECRCT) as any;
+
+    const address = await this.userAddressRepository.find({
+      where: { user_id: _id },
+    });
+
+    return address;
   }
 
   async getUserRecord(req: Request) {

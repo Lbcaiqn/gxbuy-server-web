@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { Request } from 'express';
+import { Request, query } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderInformation } from './entities/order_information.entity';
@@ -15,6 +15,8 @@ import { CreateOrderByShopcartDto } from './dto/create-order-by-shopcart.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { verify } from 'jsonwebtoken';
 import { SECRCT } from '@/common/secrct';
+import { imageSync } from 'qr-image';
+import * as queryString from 'querystring';
 
 enum StateType {
   WAITPAID = 'wait_paid',
@@ -288,6 +290,7 @@ export class OrderService {
       const orderInformation = new OrderInformation();
       orderInformation.user = user;
       orderInformation.order_state = StateType.WAITPAID;
+      orderInformation.shop = item.shop;
 
       const newOrder = await this.orderInformationRepository.save(orderInformation);
       orderIds.push(newOrder._id);
@@ -398,12 +401,15 @@ export class OrderService {
 
     return {
       totalPrice,
-      qrcode: '',
+      qrcode: imageSync(
+        'http://159.75.181.72/#/phone-pay?' +
+          queryString.stringify({ orderIds: orderIds as string[], price: totalPrice }),
+        { type: 'svg' }
+      ),
     };
   }
 
   async getPayState(req: Request) {
-    const { _id } = verify(req.headers.authorization, SECRCT) as any;
     const { orderIds } = req.query;
 
     if (!Array.isArray(orderIds)) throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
@@ -414,7 +420,6 @@ export class OrderService {
     const data = await this.orderInformationRepository
       .createQueryBuilder('order_information')
       .where(`order_information._id IN (${orderIds})`)
-      .andWhere(`order_information.user_id = ${_id}`)
       .andWhere(`order_information.order_state = 'wait_paid'`)
       .getMany();
 
@@ -424,7 +429,6 @@ export class OrderService {
   }
 
   async completePay(req: Request, body: UpdateOrderDto) {
-    const { _id } = verify(req.headers.authorization, SECRCT) as any;
     const { orderIds } = body;
 
     if (!Array.isArray(orderIds)) throw new HttpException('参数错误', HttpStatus.BAD_REQUEST);
@@ -436,7 +440,6 @@ export class OrderService {
       .createQueryBuilder('order_information')
       .innerJoinAndSelect('order_information.order_item', 'order_item')
       .where(`order_information._id IN (${orderIds})`)
-      .andWhere(`order_information.user_id = ${_id}`)
       .andWhere(`order_information.order_state = 'wait_paid'`)
       .getMany();
 
@@ -446,8 +449,13 @@ export class OrderService {
       for (const orderItem of order.order_item) {
         const spu = await this.goodsSpuRepository.findOne({ where: { _id: orderItem.goods_spu_id } });
         const sku = await this.goodsSkuRepository.findOne({ where: { _id: orderItem.goods_sku_id } });
+        const user = await this.userRepository.findOne({ where: { _id: orderItem.user_id } });
+
         spu.goods_sku_total_sales += orderItem.quantity;
         sku.goods_sku_sales += orderItem.quantity;
+        user.order_total_wait_paid = user.order_total_wait_paid - 1 < 1 ? 0 : user.order_total_wait_paid - 1;
+
+        await this.userRepository.update(user._id, user);
         await this.goodsSpuRepository.update(spu._id, spu);
         await this.goodsSkuRepository.update(sku._id, sku);
       }
@@ -457,12 +465,6 @@ export class OrderService {
       delete order.order_item;
       await this.orderInformationRepository.update(order._id, order);
     }
-
-    const user = await this.userRepository.findOne({ where: { _id } });
-    user.order_total_wait_paid =
-      user.order_total_wait_paid - data.length < 1 ? 0 : user.order_total_wait_paid - data.length;
-
-    await this.userRepository.update(user._id, user);
 
     return '支付成功';
   }

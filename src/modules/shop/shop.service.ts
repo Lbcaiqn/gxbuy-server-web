@@ -57,7 +57,8 @@ export class ShopService {
   }
 
   async register(code: string, registerInfo: ShopRegisterDto) {
-    if (code !== registerInfo.code) throw new HttpException('验证码错误错误', HttpStatus.BAD_REQUEST);
+    if (code?.toLowerCase() !== registerInfo.code?.toLowerCase())
+      throw new HttpException('验证码错误错误', HttpStatus.BAD_REQUEST);
 
     if (await this.shopRepository.findOne({ where: { shop_account: registerInfo.shop_account } })) {
       throw new HttpException('账号已存在', HttpStatus.BAD_REQUEST);

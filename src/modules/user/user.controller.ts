@@ -42,6 +42,14 @@ export class UserController {
     return this.userService.getUserInfo(req);
   }
 
+  @Get('/jwt/getUserAddress')
+  @SetMetadata('jwt', true)
+  @ApiOperation({ summary: '获取用户收货地址', description: '获取用户收货地址' })
+  @ApiBearerAuth()
+  getUserAddress(@Req() req) {
+    return this.userService.getUserAddress(req);
+  }
+
   @Get('/jwt/getUserRecord')
   @SetMetadata('jwt', true)
   @ApiOperation({ summary: '获取用户其他信息', description: '收藏、关注、浏览记录、搜索记录' })

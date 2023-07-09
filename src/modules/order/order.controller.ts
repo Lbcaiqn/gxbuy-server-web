@@ -6,7 +6,7 @@ import { CreateOrderByShopcartDto } from './dto/create-order-by-shopcart.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { ValidatePipe } from '@/common/pipe/validate.pipe';
 import { VarifyParamsQuery } from '@/tools/varifyParamsQuery';
-import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller({
   path: 'order',
@@ -69,16 +69,14 @@ export class OrderController {
     return this.orderService.getPayInfo(req);
   }
 
-  @Get('/jwt/getPayState')
-  @SetMetadata('jwt', true)
+  @Get('/getPayState')
   @ApiOperation({ summary: '支付状态', description: '支付状态' })
   @ApiQuery({ name: 'orderIds', description: '订单id数组', required: true, type: Array<string> })
   getPayState(@Req() req) {
     return this.orderService.getPayState(req);
   }
 
-  @Patch('/jwt/completePay')
-  @SetMetadata('jwt', true)
+  @Patch('/completePay')
   @ApiOperation({ summary: '完成交易', description: '完成交易' })
   completePay(@Req() req, @Body(ValidatePipe) body: UpdateOrderDto) {
     return this.orderService.completePay(req, body);
